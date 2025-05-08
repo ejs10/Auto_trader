@@ -1,0 +1,183 @@
+<!-- auto_trader/app/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📊 주식 백테스트 대시보드</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h2>📈 전략 백테스트</h2>
+
+  <label>종목 (예: AAPL):</label>
+  <input type="text" id="ticker" value="AAPL"><br>
+
+  <label>기간 (예: 6mo):</label>
+  <input type="text" id="period" value="6mo"><br>
+
+  <label>전략:</label>
+  <select id="strategy">
+    <option value="ma">이동평균 (MA)</option>
+    <option value="rsi">RSI</option>
+  </select><br><br>
+
+  <button onclick="runBacktest()">🚀 백테스트 실행</button>
+
+  <h3>💰 결과</h3>
+  <pre id="resultText"></pre>
+
+  <h3>📉 가격 + 시그널</h3>
+  <canvas id="priceChart" width="800" height="400"></canvas>
+
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
+
+<!--
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주식 자동매맸 전략 UI</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+      color: #555;
+    }
+    select, input[type=range], button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>주식 자동매맸 전략 UI</h2>
+
+    <label for="ticker">📌 종목 선택</label>
+    <select id="ticker">
+      <option value="AAPL">AAPL</option>
+      <option value="TSLA">TSLA</option>
+      <option value="GOOG">GOOG</option>
+      <option value="MSFT">MSFT</option>
+    </select>
+
+    <label for="period">⏳ 데이터 기간</label>
+    <select id="period">
+      <option value="3mo">3개월</option>
+      <option value="6mo">6개월</option>
+      <option value="1y">1년</option>
+    </select>
+
+    <label for="strategy">🧠 전략 선택</label>
+    <select id="strategy">
+      <option value="ma">이동평균 (MA)</option>
+      <option value="rsi">RSI</option>
+    </select>
+
+    <div id="ma-settings">
+      <label for="short-ma">단기 MA</label>
+      <input type="range" id="short-ma" min="5" max="20" value="10">
+
+      <label for="long-ma"> 장기 MA</label>
+      <input type="range" id="long-ma" min="25" max="60" value="40">
+    </div>
+
+    <div id="rsi-settings" style="display: none;">
+      <label for="rsi-period">RSI 기간</label>
+      <input type="range" id="rsi-period" min="5" max="30" value="14">
+
+      <label for="rsi-overbought">과매수 기준</label>
+      <input type="range" id="rsi-overbought" min="60" max="90" value="70">
+
+      <label for="rsi-oversold">과매도 기준</label>
+      <input type="range" id="rsi-oversold" min="10" max="40" value="30">
+    </div>
+
+    <button onclick="runBacktest()">🚀 백테스트 시작</button>
+  </div>
+
+  <script>
+    function runBacktest() {
+      const ticker = document.getElementById('ticker').value;
+      const period = document.getElementById('period').value;
+      const strategy = document.getElementById('strategy').value;
+
+      let params = {};
+
+      if (strategy === 'ma') {
+        params = {
+          short: document.getElementById('short-ma').value,
+          long: document.getElementById('long-ma').value
+        };
+      } else if (strategy === 'rsi') {
+        params = {
+          rsi_period: document.getElementById('rsi-period').value,
+          overbought: document.getElementById('rsi-overbought').value,
+          oversold: document.getElementById('rsi-oversold').value
+        };
+      }
+
+      fetch("http://localhost:5000/backtest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          ticker: ticker,
+          period: period,
+          strategy: strategy,
+          params: params
+        })
+      })
+      .then(response => response.json())
+      .then(result => {
+        alert(
+          `✅ 백테스트 완료!\\n` +
+          `📌 총 수익률: ${parseFloat(result.total_profit).toFixed(2)} $\\n` +
+          `💰 보유 현금: ${result.cash} $\\n` +
+          `📦 보유 수량: ${result.position}`
+        );
+      })
+      .catch(error => {
+        console.error("백테스트 오류:", error);
+        alert("❌ 백테스트 실행 중 오류 발생. 콘솔을 확인하세요.");
+      });
+    }
+  </script>
+</body>
+</html>
+-->
