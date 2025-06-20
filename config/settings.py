@@ -12,6 +12,7 @@ class Config:
 
 
 
+
     # 거래 기본 설정
     TICKER = "AAPL"  # 예시 종목 코드 (키움은 '005930'처럼 사용)
     TRADE_QUANTITY = 10  # 한 번에 매수/매도할 수량
